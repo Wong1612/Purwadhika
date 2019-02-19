@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang = "en">
+<html>
+    <head>
+        <link rel = "stylesheet" type = "text/css">
+        <meta charset = "UTF-8">
+        <meta name = "viewport" content = "width = device-width, initial-scale = 1.0">
+        <meta http-equiv="X-UX-Compatible" content = "ie-edge">
+        <title>THE IDOLM@STER JEWEL SHOP</title>
+    </head>
+
+    <style>
+    table,th,td {
+        border: 2px solid lightgrey;
+        font-family: 'Mont';
+        border-collapse: collapse;
+        margin-left: 40px;
+        width: 650px;
+        text-align: center;
+    }
+
+    #tableOne {
+        float: left;
+        margin-left: 50px;
+        border-collapse: collapse
+    }
+    
+    thead {
+        background-color: darkred
+    }
+    
+    h1 {
+        font-family: 'Mont'
+    }
+
+    h2 {
+        font-family: 'Mont'
+    }
+    
+    p {
+        font-family: 'Mont';
+        color: white
+    }
+
+    input[type = "button"] {
+        background-color: darkred;
+        color: white;
+        font-size: 16px;
+        border-radius: 2px;
+        font-family: 'Mont';
+        padding: 10px 20px
+    }
+
+    #timer {
+        font-family: 'Mont';
+        font-size: 20px
+    }
+
+   #payItem {
+        font-family: 'Mont';
+        font-size: 12px
+   }
+
+   #payTable {
+       width: 400px
+   }
+
+   input[type = "number"] {
+       width: 200px;
+       font-family: 'Mont';
+       font-size: 24px;
+       padding: 10px 20px
+   }
+
+    </style>
+    
+    <body>
+        <center>
+            <audio id = "bnt" preload = "auto" src = "bnt.mp3"></audio>
+            <img src = "imaslogo.png" style = "width: 350px">
+            <h1>Buy Your Million Jewels Today! ミリオンジュエル買いましょう！</h1>
+            <table id = 'tableOne'>
+                <thead>
+                <tr>
+                    <td><p>Jewel Packet</p></td>
+                    <td><p>Amount</p></td>
+                    <td><p>Price (Yen)</p></td>
+                    <td><p>Item Action</p></td>
+                </tr>
+                </thead>
+                <tbody id = "fillTable"></tbody>
+            </table>
+            <br>
+            <table>
+                <h1>Shopping Cart</h1>
+                <h2 id = 'sumPrice'>Total Price: ¥0</h2>
+                <thead>
+                <tr>
+                    <td><p>Jewel Packet</p></td>
+                    <td><p>Amount</p></td>
+                    <td><p>Item Quantity</p></td>
+                    <td><p>Price (Yen)</p></td>
+                    <td><p>Item Action</p></td>
+                </tr>
+                </thead>
+                <tbody id = 'fillItemAddToTable'></tbody>
+            </table>
+                <br>
+                <h2 id = 'addJewel'>You currently have 0 items in the cart.</h2>
+                <checkout id = 'chkout'></checkout>
+                <timer id = 'timer'></timer>
+                <payItem id = 'itemPay'></payItem>
+                <br>
+                <br>
+        </center>
+
+        <script>
+                var time = 0
+
+                class ItemMenu {
+                    constructor (jewelPacket, quantity, price) {
+                        this.jewelPacket = jewelPacket
+                        this.quantity = quantity
+                        this.price = price
+                    }
+                }
+        
+                var itemdata = [
+                    new ItemMenu ('Jewel Packet A','60',120),
+                    new ItemMenu ('Jewel Packet B','360',480),
+                    new ItemMenu ('Jewel Packet C','720',960),
+                    new ItemMenu ('Jewel Packet D','1300',1600),
+                    new ItemMenu ('Jewel Packet E','2650',3200),
+                    new ItemMenu ('Jewel Packet F','4200',5000),
+                    new ItemMenu ('Jewel Packet G','8400',9800)
+                ]
+        
+                var itemQty = []
+                var newCart = []
+
+                function display(arr) {
+                    var output = ''
+                    var a = arr.map(function(item, index) {
+                        return `<tr>
+                                <td><img src = 'millionjewel.png' width = '50px'>
+                                <br>${item.jewelPacket}</td>
+                                <td>${item.quantity}</td>
+                                <td>¥${item.price}</td>
+                                <td><input type = 'button' value = ' Add Item' onclick = "addItem('${index}')"></td>
+                                </tr>`
+                    })
+                    output = a.join('')
+                    document.getElementById('fillTable').innerHTML = output
+                }
+                display(itemdata)
+
+                function addItem(idx) {
+                    if (window.confirm('Do you want to add this item to your cart?')) {
+                        var qty = parseInt(prompt('Please insert quantity: '))
+                        if (!newCart.includes(itemdata[idx])) {
+                            newCart.push(itemdata[idx])
+                            itemQty.push(qty)
+                        } else {
+                            itemQty[newCart.indexOf(itemdata[idx])] += qty
+                        }
+                        
+                        var totalItem = 0
+                        var sum = 0
+
+                        for (var i = 0; i < itemQty.length; i++) {
+                            totalItem += itemQty[i]
+                        }
+                        document.getElementById('addJewel').innerHTML = `You currently have ${totalItem} items in the cart.`
+
+                        for (var j = 0; j < itemQty.length; j++) {
+                            sum += newCart[j].price * itemQty[j]
+                        }
+                        document.getElementById('sumPrice').innerHTML = `Total Price: ¥${sum}`
+                        document.getElementById('chkout').innerHTML = `
+                        <td><input type = "button" value = "Checkout" onclick = "checkout()"></td>`
+                    }
+                    displayCart(newCart)
+                }
+
+                function displayCart(arr) {
+                    var output = ''
+                    var a = arr.map(function(item, index) {
+                        return `<tr>
+                                <td><img src = 'millionjewel.png' width = '50px'>
+                                <br>${item.jewelPacket}</td>
+                                <td>${item.quantity}</td>
+                                <td>${itemQty[index]}</td>
+                                <td>¥${item.price}</td>
+                                <td><input type = 'button' value = 'Delete Item' onclick = "deleteItem('${index}')"></td>
+                                </tr>`
+                    })
+                    output = a.join('')
+                    document.getElementById('fillItemAddToTable').innerHTML = output
+                }
+                
+                function deleteItem(idx) {
+                    if (window.confirm(`Are you sure you want to delete ${newCart[idx].jewelPacket}?`)) {
+                        var qty = parseInt(prompt('Please delete quantity'))
+                        if (qty >= itemQty[idx]) {
+                            newCart.splice(idx,1)
+                            itemQty.splice(idx,1)
+                        } else {
+                            itemQty[newCart.indexOf(newCart[idx])] -= qty
+                        }
+
+                        displayCart(newCart)
+
+                        var totalItem = 0
+                        var sum = 0
+
+                        for (var i = 0; i < itemQty.length; i++) {
+                            totalItem += itemQty[i]
+                        }
+                        document.getElementById('addJewel').innerHTML = `You currently have ${totalItem} items in the cart.`
+
+                        for (var j = 0; j < itemQty.length; j++) {
+                            sum += newCart[j].price * itemQty[j]
+                        }
+                        document.getElementById('sumPrice').innerHTML = `Total Price: ¥${sum}`
+                        document.getElementById('chkout').innerHTML = ``
+
+                    }
+                }
+
+                function checkout() {
+                    startTimer()
+                    document.getElementById('chkout').innerHTML = ``
+                    document.getElementById('itemPay').innerHTML = 
+                    `<tr> 
+                    <br>
+                    <td><input type = "number" id = "payItem" placeholder = "Insert Amount Here" style = "font-size: 16px"></td>
+                    <td><input type = "button" value = "Pay" onclick = "itemPaid()"></td>
+                    </tr>`
+                }
+
+
+                function checkoutTimer() {
+                    sec -= 1
+                    document.getElementById('timer').innerHTML = `You have ${sec} seconds left to pay!`
+                    if (sec == 0) {
+                        sec = 0
+                        alert('Session has expired, please re-choose your items!')
+                        clearInterval(x)
+                        reset()
+                    }
+                }
+
+                var x; 
+                var sec;
+
+                function startTimer() {
+                    sec = 40
+                    document.getElementById('timer').innerHTML = `You have ${sec} seconds left to pay!`
+                    x = setInterval(checkoutTimer, 1000)
+                } 
+
+                function reset() {
+                    sum = []
+                    newCart = []
+                    itemQty = []
+                    displayCart(newCart)
+                    document.getElementById('addJewel').innerHTML = `You currently have 0 items in the cart.`
+                    document.getElementById('sumPrice').innerHTML = `Total Price: ¥0`
+                    document.getElementById('chkout').innerHTML = ``
+                    document.getElementById('timer').innerHTML = ``
+                    document.getElementById('itemPay').innerHTML = ``
+                }
+
+                function itemPaid() {
+                    var selectorPay = document.getElementById('payItem')
+                    var sum = 0
+
+                    for (var j = 0; j < itemQty.length; j++) {
+                        sum += newCart[j].price * itemQty[j]
+                    }
+
+                    if (selectorPay.value < sum) {
+                        alert(`Please pay the remaining ¥${sum - selectorPay.value}`)
+                    } else if (selectorPay.value == sum) {
+                        alert(`You have paid the exact amount. Thank you for shopping!`)
+                        clearInterval(x)
+                        reset()
+                    } else if (selectorPay.value > sum) {
+                        alert(`Your Change is ¥${selectorPay.value - sum}. Thank you for shopping!`)
+                        clearInterval(x)
+                        reset()
+                    }
+                }
+
+                var myAudio = document.getElementById('bnt')
+                myAudio.addEventListener('canplaythrough', function() {
+                    this.currentTime = 5
+                    this.play()
+                })
+            </script>
+    </body>
+
+    
+    
